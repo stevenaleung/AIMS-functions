@@ -62,7 +62,7 @@ if SN == 1516
     load freqSensitivity_sn1516.mat % formerly freqSensitivity.mat
 elseif SN == 1572
     load freqSensitivity_sn1572.mat % formerly freqSensitivityNew.mat
-elseif SN == 1633
+elseif SN == 1663
     load freqSensitivity_sn1663.mat
 end
 
