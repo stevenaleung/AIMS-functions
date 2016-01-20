@@ -38,7 +38,7 @@ elseif nargin == 3
     errormsg = ['Please specify hydrophone serial number.\n'...
         'Old hydrophone: 1516\n'...
         'New hydrophone: 1572\n'...
-        'Willmann lab hydrophone: 1633'];
+        'Willmann lab hydrophone: 1663'];
     error('a:a:a', errormsg)
 end
 
@@ -63,7 +63,7 @@ if SN == 1516
 elseif SN == 1572
     load freqSensitivity_sn1572.mat % formerly freqSensitivityNew.mat
 elseif SN == 1633
-    load freqSensitivity_sn1633.mat
+    load freqSensitivity_sn1663.mat
 end
 
 % based on frequency, look up hydrophone sensitivity

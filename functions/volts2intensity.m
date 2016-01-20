@@ -1,4 +1,4 @@
-function I = volts2intensity(data, f, units)
+function I = volts2intensity(data, f, units, SN)
 
 % Vpp2intensity - This code converts peak-to-peak voltage (V) as measured
 %                 from a HNR-0500 hydrophone to instantaneous intensity W/cm^2
@@ -28,7 +28,7 @@ function I = volts2intensity(data, f, units)
 % SAL 2015-11-23
 % Patrick Ye, 1/19/16
 
-Pa = volts2pressure(data, f, units);
+Pa = volts2pressure(data, f, units, SN);
 
 % calculate pulse average acoustic intensity (Prms, or Pmax/sqrt(2))
 Wm2 = Pa.^2 / 2 / 1000 / 1500; % W/m^2
