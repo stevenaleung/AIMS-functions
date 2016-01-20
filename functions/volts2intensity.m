@@ -13,6 +13,7 @@ function I = volts2intensity(data, f, units)
 %   - V         DC to peak voltage
 %   - mVpp      peak to peak mV
 %   - mV        DC to peak mV
+% SN            hydrophone serial number (4 digits)
 %
 % -- outputs --
 % I             vector output in units of W/cm^2
@@ -25,6 +26,7 @@ function I = volts2intensity(data, f, units)
 % -- edit history --
 % Patrick Ye, Butts Pauly Lab, Stanford University
 % SAL 2015-11-23
+% Patrick Ye, 1/19/16
 
 Pa = volts2pressure(data, f, units);
 

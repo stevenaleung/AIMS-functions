@@ -16,7 +16,7 @@ function Pa = volts2pressure(data, f, units, SN)
 %
 %
 % -- outputs --
-% Pa            peak pressure in Pascals
+% I             vector output in units of W/cm^2
 %
 %
 % Assumed parameters:
@@ -67,7 +67,7 @@ elseif SN == 1633
 end
 
 % based on frequency, look up hydrophone sensitivity
-% exception for frequencies out of calibrated range
+% exception for frequencies too low or too high
 if f < min(freq) || f > max(freq)
     warning('requested frequency out of range, closest frequency used')
     if f < min(freq)
