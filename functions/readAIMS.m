@@ -168,7 +168,8 @@ for i = 1:numParams
 end
 
 clear data
-variables = {'rawData', 'paramName', 'xAxis', 'yAxis', 'cAxis', 'xName', 'yName'};
+variables = {'rawData', 'paramName', 'xAxis', 'yAxis', 'xName', 'yName'}; % if plots==0, can't save a cAxis
+% variables = {'rawData', 'paramName', 'xAxis', 'yAxis', 'cAxis', 'xName', 'yName'};
 for i = 1:length(variables)
     data.(variables{i}) = eval(variables{i});
 end
