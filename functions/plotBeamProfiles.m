@@ -4,6 +4,9 @@ function plotBeamProfiles(data, inds, newcAxis, newAxis)
 %   This code takes a structure containing hydrophone data and plots the beam
 %   profiles.
 %
+% -- usage --
+% plotBeamProfiles(data, 1:3, [0 0.1], [-5 5 -5 5]);
+%
 % -- inputs --
 % data          	structure containing hydrophone data. this was an output of
 %                       readAIMS.m
@@ -51,7 +54,7 @@ for i = inds
     h = colorbar;
     xlabel(h, 'Vpp')                                % TODO: verify we can make this assumption
     axis equal
-    if nargin == 4 % if new axis are requested
+    if exist('newAxis', 'var') % if new axes are requested
         axis(newAxis);
     else
         axis([xAxis(1) xAxis(end) yAxis(1) yAxis(end)]);
