@@ -1,40 +1,21 @@
-function data = readAIMS(fileName, plotFlag, newcAxis, newAxis)
+function data = readAIMS(filename)
 
 % readAIMS
 %   This code reads and parses AIMS files containing hydrophone data. The output
 %   contains all the data in MATLAB usable format.
 %
 % -- inputs --
-% fileName          string input for the data file path. It should end in '.AIM'
-%
-% optional:
-% plotFlag          {true} | false      flag determining whether plotFlag should be displayed.
-% newcAxis          new colorbar axis. New colorbar axis can be specified
-%                       numerically in the form [min max] where min and max
-%                       specify the limits for the colorbar axis. Or, the new
-%                       colorbar axis can be copied from another scan's colorbar
-%                       axis, in which case newcAxis is a string input (e.g.
-%                       'scanXZaddon'). By default, readAIMS will match the
-%                       colorbar axis with the corresponding skullAbsent /
-%                       skullPresent scan if such axes exist. If newcAxis is [],
-%                       readAIMS will not set a new colorbar axis.
-% newAxis           vector input in the form [xMin xMax yMin yMax] in units of mm
+% filename          string input for the data file path. It should end in '.AIM'
 %
 % -- outputs --
 % data              structure containing raw data, parameter name, axis labels,
-%                       axis tick marks, & color axis
-%
+%                       axis tick marks
 %
 % -- edit history --
 % Patrick Ye, Butts Pauly Lab, Stanford University
 % 2015-11-23 SAL    
 % 2016-01-19 SAL    modified function to handle multiple data parameters
 % 2016-01-25 SAL    refactored code
-
-% if plotFlag should be displayed
-if nargin == 1
-    plotFlag = true;
-end
 
 % the data looks like this
 %       -10 -9.8 ... 10     <- first axis
@@ -52,7 +33,7 @@ end
 %% setup
 % load the .AIM file and grab all the relevant parameters:
 %   collected parameters, size of data matrix, axis names, axis bounds, etc.
-aimsFile = loadTextFile(fileName);
+aimsFile = loadTextFile(filename);
 dataStartInds = findLines(aimsFile, '2D Scan Data');
 
 % collected parameters
@@ -109,7 +90,7 @@ for i = 1:numParams
 
     % read data from file. textscan() stops reading additional lines once an
     % empty line is reached
-    fid = fopen(fileName);
+    fid = fopen(filename);
     tmp = textscan(fid, '%f', 'headerlines', dataStartInds(i)); 
     data = tmp{1};
     fclose(fid);
@@ -131,57 +112,9 @@ for i = 1:numParams
     end
 end %for i
 
-%% create beam profile plots
-% VOLTAGE plot (note: up down is switched compared to AIMS plots)
-if plotFlag
-    cAxis = cell(numParams, 1);
-    for i = 1:numParams
-        figure;
-        if strcmp(paramNames{i}, 'Negative Peak Voltage')
-            % invert the values for peak negative voltage so that the plots have
-            % similar color axes
-            imagesc([xAxis(1) xAxis(end)], [yAxis(1) yAxis(end)], -rawData{i});
-        else
-            imagesc([xAxis(1) xAxis(end)], [yAxis(1) yAxis(end)], rawData{i});
-        end
-        colormap(hot);
-        colorbar;
-        title({fileName; paramNames{i}});
-        xlabel(xAxisName);
-        ylabel(yAxisName);
-        h = colorbar;
-        xlabel(h, 'Vpp')                                % TODO: verify we can make this assumption
-        if nargin == 4 % if new axis are requested
-            axis(newAxis);
-        else
-            axis([xAxis(1) xAxis(end) yAxis(1) yAxis(end)]);
-        end
-        axis equal
-        
-        % if a new cAxis is specified, change the cAxis of the plot
-        if nargin >= 3
-            if isnumeric(newcAxis) % if numeric new cAxis specified and nonzero
-                if numel(newcAxis) == 2 % skip if newcAxis == []
-                    caxis(newcAxis);
-                end
-            elseif ischar(newcAxis) % if new cAxis is the cAxis from another scan
-                load(newcAxis)
-                eval(['cAxis = ' newcAxis '.cAxis;'])
-                caxis(cAxis);
-            end
-        end
-        
-        cAxis{i} = caxis;
-        
-    end %for i
-end %if plotFlag
-
 %% export relevant information in a structure
 clear data
-variables = {'rawData'; 'paramNames'; 'xAxis'; 'yAxis'; 'xAxisName'; 'yAxisName'};
-if plotFlag
-    variables = [variables; {'cAxis'}];
-end
+variables = {'filename'; 'rawData'; 'paramNames'; 'xAxis'; 'yAxis'; 'xAxisName'; 'yAxisName'};
 for i = 1:length(variables)
     data.(variables{i}) = eval(variables{i});
 end
