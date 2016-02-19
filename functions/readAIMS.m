@@ -178,7 +178,7 @@ end %if plotFlag
 
 %% export relevant information in a structure
 clear data
-variables = {'rawData'; 'paramNames'; 'xAxis'; 'yAxis'; 'xMax'; 'yMax'; 'xAxisName'; 'yAxisName'};
+variables = {'rawData'; 'paramNames'; 'xAxis'; 'yAxis'; 'xMin'; 'yMin'; 'xMax'; 'yMax'; 'xAxisName'; 'yAxisName'};
 if plotFlag
     variables = [variables; {'cAxis'}];
 end
