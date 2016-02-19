@@ -18,7 +18,7 @@ function txt = loadTextFile(filename)
 fid = fopen(filename);
 
 %% load lines into cell array
-tmp = textscan(fid, '%s', 'delimiter', {'/n'});
+tmp = textscan(fid, '%s', 'delimiter', '\n');
 txt = tmp{1};
 
 %% close file

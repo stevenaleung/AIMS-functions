@@ -5,8 +5,8 @@ function Pa = volts2pressure(data, f, units, SN)
 %
 % -- inputs --
 % data          vector input for voltage values to convert to intensity
-% frequency     vector input (same size as data) representing the 
-%               US frequency (in MHz) at which data was collected 
+% frequency     vector input (same size as data) representing the
+%               US frequency (in MHz) at which data was collected
 % units         string input specifying units of data
 %   - Vpp       peak to peak voltage
 %   - V         DC to peak voltage
@@ -38,63 +38,87 @@ elseif nargin == 3
     errormsg = ['Please specify hydrophone serial number.\n'...
         'Old hydrophone: 1516\n'...
         'New hydrophone: 1572\n'...
-        'Willmann lab hydrophone: 1663'];
+        'Willmann lab hydrophone: 1663\n'...
+        'Khuri-Yakub lab hydrophone: 1364'];
     error('a:a:a', errormsg)
 end
 
-% convert whatever the input units are to mV
-if strcmp(units, 'Vpp')     % peak to peak voltage
-    Vpp = data;
-    mVpp = Vpp * 1000;
-    mV   = mVpp / 2;
-elseif strcmp(units, 'V')   % voltage amplitude
-    V = data;
-    mV = V * 1000;
-elseif strcmp(units, 'mVpp')
-    mVpp = data;
-    mV = mVpp / 2;
-elseif strcmp(units, 'mV')
-    mV = data;
-end
 
-% load hydrophone sensitivity values
-if SN == 1516
-    load freqSensitivity_sn1516.mat % formerly freqSensitivity.mat
-elseif SN == 1572
-    load freqSensitivity_sn1572.mat % formerly freqSensitivityNew.mat
-elseif SN == 1663
-    load freqSensitivity_sn1663.mat
-end
-
-% based on frequency, look up hydrophone sensitivity
-% exception for frequencies out of calibrated range
-if f < min(freq) || f > max(freq)
-    warning('requested frequency out of range, closest frequency used')
-    if f < min(freq)
-        f = min(freq);
-    else
-        f = max(freq);
+if SN ~= 1364
+    
+    % convert whatever the input units are to mV
+    if strcmp(units, 'Vpp')     % peak to peak voltage
+        Vpp = data;
+        mVpp = Vpp * 1000;
+        mV   = mVpp / 2;
+    elseif strcmp(units, 'V')   % voltage amplitude
+        V = data;
+        mV = V * 1000;
+    elseif strcmp(units, 'mVpp')
+        mVpp = data;
+        mV = mVpp / 2;
+    elseif strcmp(units, 'mV')
+        mV = data;
     end
-end
-
-idx = ones(size(f));
-for i = 1:size(f, 1)
-    for j = 1:size(f, 2)
-        tmp = abs(freq - f(i,j));
-        ind = find(tmp < 1e-15);
-        if isempty(ind)
-            [~, ind] = min(tmp);
+    
+    % load hydrophone sensitivity values
+    if SN == 1516
+        load freqSensitivity_sn1516.mat % formerly freqSensitivity.mat
+    elseif SN == 1572
+        load freqSensitivity_sn1572.mat % formerly freqSensitivityNew.mat
+    elseif SN == 1663
+        load freqSensitivity_sn1663.mat
+    end
+    
+    % based on frequency, look up hydrophone sensitivity
+    % exception for frequencies out of calibrated range
+    if f < min(freq) || f > max(freq)
+        warning('requested frequency out of range, closest frequency used')
+        if f < min(freq)
+            f = min(freq);
+        else
+            f = max(freq);
         end
-        idx(i,j) = ind;
     end
-end
-s = sens(idx); % sensitivities (V/Pa) for the input frequencies
-Pa = mV ./ s / 1e3; % Pa, peak pressure.
-
-% the conversion written out:
-%
-%  mV |  1 V   | 1 Pa |
-% ----|--------|------| = Pa, peak pressure
-%     | 1e3 mV | n V  |
-
+    
+    idx = ones(size(f));
+    for i = 1:size(f, 1)
+        for j = 1:size(f, 2)
+            tmp = abs(freq - f(i,j));
+            ind = find(tmp < 1e-15);
+            if isempty(ind)
+                [~, ind] = min(tmp);
+            end
+            idx(i,j) = ind;
+        end
+    end
+    s = sens(idx); % sensitivities (V/Pa) for the input frequencies
+    Pa = mV ./ s / 1e3; % Pa, peak pressure.
+    
+    % the conversion written out:
+    %
+    %  mV |  1 V   | 1 Pa |
+    % ----|--------|------| = Pa, peak pressure
+    %     | 1e3 mV | n V  |
+    
+else
+    
+    Pa_V_factor = ky_volt_to_pa(f*1e6); % units of Pa/V conversion factor
+    
+    % convert whatever the input units are to V
+    if strcmp(units, 'Vpp')     % peak to peak voltage
+        Vpp = data;
+        V = Vpp / 2;
+    elseif strcmp(units, 'V')   % voltage amplitude
+        V = data;
+    elseif strcmp(units, 'mVpp')
+        mVpp = data;
+        V = mVpp / 2 * 1000;
+    elseif strcmp(units, 'mV')
+        mV = data;
+        V = mV * 1000;
+    end
+    
+    Pa = V * Pa_V_factor;
+    
 end

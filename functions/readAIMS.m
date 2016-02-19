@@ -79,7 +79,7 @@ tmp = strsplit(aimsFile{secondAxisInd(1)});
 yAxisNum = str2double(tmp{3});
 yAxisName = axisNum2Name(yAxisNum);
 
-% axis bounds
+% get entire axis
 xMinInd = findLines(aimsFile, 'XMin');
 tmp = strsplit(aimsFile{xMinInd});
 xMin = str2double(tmp{2});
@@ -96,8 +96,6 @@ yMaxInd = findLines(aimsFile, 'YMax');
 tmp = strsplit(aimsFile{yMaxInd});
 yMax = str2double(tmp{2});
 
-xAxis = [xMin xMax];
-yAxis = [yMin yMax];
 
 %% read the data into MATLAB usable format
 rawData = cell(numParams, 1);
@@ -114,12 +112,14 @@ for i = 1:numParams
     data = tmp{1};
     fclose(fid);
     
-    % the data matrix contains x- and y-axis values that we don't care about. we
+    % the data matrix contains x- and y-axis values that we absolutely do care about. we
     % prepend a 0 in order to get the right number of elements
     % (cols+1)*(rows+1). afterwards, we can reshape the data and remove the
     % first row and first column (the axis values).
     data = [0; data];
     data = reshape(data, [dataNumCols+1, dataNumRows+1]);
+    xAxis = data(2:end, 1);
+    yAxis = data(1, 2:end);
     data = data(2:end, 2:end);
     data = data';
     rawData{i} = data;
@@ -178,7 +178,7 @@ end %if plotFlag
 
 %% export relevant information in a structure
 clear data
-variables = {'rawData'; 'paramNames'; 'xAxis'; 'yAxis'; 'xAxisName'; 'yAxisName'};
+variables = {'rawData'; 'paramNames'; 'xAxis'; 'yAxis'; 'xMax'; 'yMax'; 'xAxisName'; 'yAxisName'};
 if plotFlag
     variables = [variables; {'cAxis'}];
 end
